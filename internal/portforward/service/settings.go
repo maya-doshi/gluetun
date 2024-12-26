@@ -68,6 +68,7 @@ var (
 	ErrFilepathNotSet      = errors.New("file path not set")
 	ErrInterfaceNotSet     = errors.New("interface not set")
 	ErrQBitLogin           = errors.New("qBittorrent login not set")
+	ErrQBitFailed          = errors.New("qBittorrent failed to change listen port")
 )
 
 func (s *Settings) Validate(forStartup bool) (err error) {

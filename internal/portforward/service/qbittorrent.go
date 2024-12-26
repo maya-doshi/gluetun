@@ -2,17 +2,28 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 )
 
+const (
+	QBitLoginEndp    = "/api/v2/auth/login"
+	QBitSettingsEndp = "/api/v2/app/setPreferences"
+)
+
 func (s *Service) loginQBit() (err error) {
 	client := &http.Client{}
 	loginData := []byte(fmt.Sprintf("username=%s&password=%s", s.settings.QBitUser, s.settings.QBitPass))
 
-	req, err := http.NewRequest("POST", s.settings.QBitURL+"/api/v2/auth/login", bytes.NewBuffer(loginData))
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodPost,
+		s.settings.QBitURL+QBitLoginEndp,
+		bytes.NewBuffer(loginData),
+	)
 	if err != nil {
 		return ErrQBitLogin
 	}
@@ -59,7 +70,12 @@ func (s *Service) updateQBitPort(port uint16) (err error) {
 	}
 	data := []byte("json=" + url.QueryEscape(string(jsonData)))
 
-	req, err := http.NewRequest("POST", s.settings.QBitURL+"/api/v2/app/setPreferences", bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodPost,
+		s.settings.QBitURL+QBitSettingsEndp,
+		bytes.NewBuffer(data),
+	)
 	if err != nil {
 		return err
 	}
@@ -76,7 +92,7 @@ func (s *Service) updateQBitPort(port uint16) (err error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to change listen port")
+		return ErrQBitFailed
 	}
 
 	return nil
