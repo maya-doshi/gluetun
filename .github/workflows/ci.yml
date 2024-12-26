@@ -27,6 +27,7 @@ on:
       - Dockerfile
       - go.mod
       - go.sum
+  workflow_dispatch:
 
 jobs:
   verify:
