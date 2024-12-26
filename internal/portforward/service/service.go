@@ -24,6 +24,9 @@ type Service struct {
 	startStopMutex sync.Mutex
 	keepPortCancel context.CancelFunc
 	keepPortDoneCh <-chan struct{}
+	// QBitClient
+	qBitClient *http.Client
+	qBitCookie string
 }
 
 func New(settings Settings, routing Routing, client *http.Client,
@@ -40,6 +43,9 @@ func New(settings Settings, routing Routing, client *http.Client,
 		portAllower: portAllower,
 		logger:      logger,
 		cmder:       cmder,
+		// QBitClient
+		qBitClient: nil,
+		qBitCookie: "",
 	}
 }
 

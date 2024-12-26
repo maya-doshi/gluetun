@@ -29,6 +29,9 @@ type PortForwarding struct {
 	// to write to a file. It cannot be nil for the
 	// internal state
 	Filepath *string `json:"status_file_path"`
+	QBitURL  *string `json:"qbiturl"`
+	QBitUser *string `json:"qbituser"`
+	QBitPass *string `json:"qbitpass"`
 	// UpCommand is the command to use when the port forwarding is up.
 	// It can be the empty string to indicate not to run a command.
 	// It cannot be nil in the internal state.
@@ -92,6 +95,9 @@ func (p *PortForwarding) Copy() (copied PortForwarding) {
 		Enabled:       gosettings.CopyPointer(p.Enabled),
 		Provider:      gosettings.CopyPointer(p.Provider),
 		Filepath:      gosettings.CopyPointer(p.Filepath),
+		QBitURL:       gosettings.CopyPointer(p.QBitURL),
+		QBitUser:      gosettings.CopyPointer(p.QBitUser),
+		QBitPass:      gosettings.CopyPointer(p.QBitPass),
 		UpCommand:     gosettings.CopyPointer(p.UpCommand),
 		DownCommand:   gosettings.CopyPointer(p.DownCommand),
 		ListeningPort: gosettings.CopyPointer(p.ListeningPort),
@@ -104,6 +110,9 @@ func (p *PortForwarding) OverrideWith(other PortForwarding) {
 	p.Enabled = gosettings.OverrideWithPointer(p.Enabled, other.Enabled)
 	p.Provider = gosettings.OverrideWithPointer(p.Provider, other.Provider)
 	p.Filepath = gosettings.OverrideWithPointer(p.Filepath, other.Filepath)
+	p.QBitURL = gosettings.OverrideWithPointer(p.QBitURL, other.QBitURL)
+	p.QBitUser = gosettings.OverrideWithPointer(p.QBitUser, other.QBitUser)
+	p.QBitPass = gosettings.OverrideWithPointer(p.QBitPass, other.QBitPass)
 	p.UpCommand = gosettings.OverrideWithPointer(p.UpCommand, other.UpCommand)
 	p.DownCommand = gosettings.OverrideWithPointer(p.DownCommand, other.DownCommand)
 	p.ListeningPort = gosettings.OverrideWithPointer(p.ListeningPort, other.ListeningPort)
@@ -115,6 +124,9 @@ func (p *PortForwarding) setDefaults() {
 	p.Enabled = gosettings.DefaultPointer(p.Enabled, false)
 	p.Provider = gosettings.DefaultPointer(p.Provider, "")
 	p.Filepath = gosettings.DefaultPointer(p.Filepath, "/tmp/gluetun/forwarded_port")
+	p.QBitURL = gosettings.DefaultPointer(p.QBitURL, "")
+	p.QBitUser = gosettings.DefaultPointer(p.QBitUser, "")
+	p.QBitPass = gosettings.DefaultPointer(p.QBitPass, "")
 	p.UpCommand = gosettings.DefaultPointer(p.UpCommand, "")
 	p.DownCommand = gosettings.DefaultPointer(p.DownCommand, "")
 	p.ListeningPort = gosettings.DefaultPointer(p.ListeningPort, 0)
@@ -148,6 +160,11 @@ func (p PortForwarding) toLinesNode() (node *gotree.Node) {
 		filepath = "[not set]"
 	}
 	node.Appendf("Forwarded port file path: %s", filepath)
+
+	qBitURL := *p.QBitURL
+	qBitUser := *p.QBitUser
+	qBitPass := *p.QBitPass
+	node.Appendf("QBittorrent Settings: %s %s %s", qBitURL, qBitUser, qBitPass)
 
 	if *p.UpCommand != "" {
 		node.Appendf("Forwarded port up command: %s", *p.UpCommand)
@@ -183,6 +200,10 @@ func (p *PortForwarding) read(r *reader.Reader) (err error) {
 			"PORT_FORWARDING_STATUS_FILE",
 			"PRIVATE_INTERNET_ACCESS_VPN_PORT_FORWARDING_STATUS_FILE",
 		))
+
+	p.QBitURL = r.Get("QBIT_URL", reader.ForceLowercase(false))
+	p.QBitUser = r.Get("QBIT_USER", reader.ForceLowercase(false))
+	p.QBitPass = r.Get("QBIT_PASS", reader.ForceLowercase(false))
 
 	p.UpCommand = r.Get("VPN_PORT_FORWARDING_UP_COMMAND",
 		reader.ForceLowercase(false))

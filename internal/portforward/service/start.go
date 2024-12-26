@@ -69,6 +69,14 @@ func (s *Service) Start(ctx context.Context) (runError <-chan error, err error) 
 		return nil, fmt.Errorf("writing port file: %w", err)
 	}
 
+	if len(ports) > 0 {
+		err = s.updateQBitPort(ports[0])
+		if err != nil {
+			_ = s.cleanup()
+			return nil, fmt.Errorf("updating qBittorrent port: %w", err)
+		}
+	}
+
 	s.portMutex.Lock()
 	s.ports = ports
 	s.portMutex.Unlock()

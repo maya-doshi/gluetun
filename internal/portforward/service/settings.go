@@ -12,6 +12,9 @@ type Settings struct {
 	Enabled        *bool
 	PortForwarder  PortForwarder
 	Filepath       string
+	QBitURL        string
+	QBitUser       string
+	QBitPass       string
 	UpCommand      string
 	DownCommand    string
 	Interface      string // needed for PIA, PrivateVPN and ProtonVPN, tun0 for example
@@ -26,6 +29,9 @@ func (s Settings) Copy() (copied Settings) {
 	copied.Enabled = gosettings.CopyPointer(s.Enabled)
 	copied.PortForwarder = s.PortForwarder
 	copied.Filepath = s.Filepath
+	copied.QBitURL = s.QBitURL
+	copied.QBitUser = s.QBitUser
+	copied.QBitPass = s.QBitPass
 	copied.UpCommand = s.UpCommand
 	copied.DownCommand = s.DownCommand
 	copied.Interface = s.Interface
@@ -41,6 +47,9 @@ func (s *Settings) OverrideWith(update Settings) {
 	s.Enabled = gosettings.OverrideWithPointer(s.Enabled, update.Enabled)
 	s.PortForwarder = gosettings.OverrideWithComparable(s.PortForwarder, update.PortForwarder)
 	s.Filepath = gosettings.OverrideWithComparable(s.Filepath, update.Filepath)
+	s.QBitURL = gosettings.OverrideWithComparable(s.QBitURL, update.QBitURL)
+	s.QBitUser = gosettings.OverrideWithComparable(s.QBitUser, update.QBitUser)
+	s.QBitPass = gosettings.OverrideWithComparable(s.QBitPass, update.QBitPass)
 	s.UpCommand = gosettings.OverrideWithComparable(s.UpCommand, update.UpCommand)
 	s.DownCommand = gosettings.OverrideWithComparable(s.DownCommand, update.DownCommand)
 	s.Interface = gosettings.OverrideWithComparable(s.Interface, update.Interface)
@@ -58,6 +67,7 @@ var (
 	ErrPasswordNotSet      = errors.New("password not set")
 	ErrFilepathNotSet      = errors.New("file path not set")
 	ErrInterfaceNotSet     = errors.New("interface not set")
+	ErrQBitLogin           = errors.New("qBittorrent login not set")
 )
 
 func (s *Settings) Validate(forStartup bool) (err error) {
